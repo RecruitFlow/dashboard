@@ -4,8 +4,12 @@ import {
   CampaignByIdDocument,
   UpdateCampaignDocument,
 } from "@/generated/graphql/graphql.js";
-import { z } from "zod";
-import type { FormSubmitEvent } from "#ui/types";
+import * as z from "zod";
+import { useForm } from "vee-validate";
+import { toTypedSchema } from "@vee-validate/zod";
+
+type Providers = "WORKUA" | "ROBOTAUA" | "LINKEDIN";
+type CampaignEndType = "NEVER" | "DATE" | "COUNT";
 
 const { params } = useRoute();
 
@@ -15,31 +19,27 @@ definePageMeta({
   icon: "i-mage-file-plus",
   parent: "campaign",
 });
-const schema = z.object({
-  name: z.string().min(4, "Must be at least 4 characters"),
-  keyword: z.string().min(6, "Must be at least 6 characters"),
-  providers: z.array(z.string()).min(1, "At least one provider is required"),
-  endType: z.string().min(1, "End type is required"),
-});
+
+const schema = toTypedSchema(
+  z.object({
+    name: z.string().min(4, "Must be at least 4 characters"),
+    keyword: z.string().min(6, "Must be at least 6 characters"),
+    providers: z
+      .array(z.string())
+      .min(1, "At least one provider is required")
+      .default([]),
+    endType: z.string().min(1, "End type is required"),
+  })
+);
+
 const toast = useToast();
-const form = ref<HTMLFormElement>();
 
-type Schema = z.output<typeof schema>;
-
-type Providers = "WORKUA" | "ROBOTAUA" | "LINKEDIN";
-
-type CampaignEndType = "NEVER" | "DATE" | "COUNT";
-
-const state = reactive<{
-  name: string | undefined;
-  keyword: string | undefined;
-  providers: Providers[];
-  endType: CampaignEndType;
-}>({
-  name: undefined,
-  keyword: undefined,
-  providers: ["WORKUA"],
-  endType: "NEVER",
+const form = useForm({
+  validationSchema: schema,
+  initialValues: {
+    providers: [] as Providers[],
+    endType: "NEVER" as CampaignEndType,
+  },
 });
 
 const providersList = ref<{ label: string; value: Providers; icon: string }[]>([
@@ -60,17 +60,22 @@ const providersList = ref<{ label: string; value: Providers; icon: string }[]>([
   },
 ]);
 
-const endTypeList = ref<CampaignEndType[]>(["COUNT", "DATE", "NEVER"]);
+const endTypeList = [
+  { label: "Never", value: "NEVER", icon: "i-mage-reload" },
+  { label: "Date", value: "DATE", icon: "i-mage-alarm-clock" },
+  { label: "Count", value: "COUNT", icon: "i-mage-lock" },
+];
 
-async function onSubmit(event: FormSubmitEvent<Schema>) {
+const onSubmit = form.handleSubmit(async (values) => {
+  console.log(values);
   const isUpdate = !!params.id;
 
   const result = await useMutation(
     isUpdate ? UpdateCampaignDocument : CreateCampaignDocument,
     {
       variables: isUpdate
-        ? { updateCampaignInput: event.data, id: params.id }
-        : { createCampaignInput: event.data },
+        ? { updateCampaignInput: values, id: params.id as string }
+        : { createCampaignInput: values },
     }
   ).mutate();
 
@@ -87,7 +92,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
   if (success) {
     navigateTo({ name: "campaign" });
   }
-}
+});
 
 if (params.id) {
   const { data } = await useAsyncQuery(CampaignByIdDocument, {
@@ -97,10 +102,12 @@ if (params.id) {
   const campaign = data.value?.campaignById;
 
   if (campaign) {
-    state.name = campaign.name;
-    state.keyword = campaign.keyword;
-    state.providers = [...campaign.providers] as Providers[];
-    state.endType = campaign.endType as CampaignEndType;
+    form.setValues({
+      name: campaign.name,
+      keyword: campaign.keyword,
+      providers: [...campaign.providers] as Providers[],
+      endType: campaign.endType as CampaignEndType,
+    });
   }
 }
 </script>
@@ -109,89 +116,102 @@ if (params.id) {
   <div>
     <ClientOnly>
       <Teleport to="#nav-toolbar">
-        <ShaButton @click="form?.submit()" variant="default">
-          Submit
-        </ShaButton>
+        <ShaButton @click="onSubmit" variant="secondary"> Submit </ShaButton>
       </Teleport>
     </ClientOnly>
-    <UForm
-      ref="form"
-      :schema="schema"
-      :state="state"
-      class="flex gap-10 w-full"
-      @submit="onSubmit"
-    >
+    <Form class="flex gap-10 w-full" @submit="onSubmit">
       <div class="flex flex-col gap-4 basis-1/3">
-        <UFormGroup size="lg" label="Name" name="name">
-          <UInput
-            v-model="state.name"
-            placeholder="HireHub back-end June"
+        <ShaFormField v-slot="{ componentField }" size="lg" name="name">
+          <AtomFormInput
+            label="Name"
+            name="name"
             icon="i-mage-bookmark-minus"
+            placeholder="Back-end"
+            :field="componentField"
           />
-        </UFormGroup>
+        </ShaFormField>
 
-        <UFormGroup
-          size="lg"
-          label="Keyword"
-          name="keyword"
-          help="Will be used as main search keyword"
-        >
-          <UInput
-            v-model="state.keyword"
-            placeholder="Senior Pomidor"
-            hint="Required"
+        <ShaFormField v-slot="{ componentField }" size="lg" name="keyword">
+          <AtomFormInput
+            label="Keyword"
+            name="keyword"
             icon="i-mage-stars-c"
+            placeholder="Senior Pomidor"
+            description="Will be used as main search keyword"
+            :field="componentField"
           />
-        </UFormGroup>
+        </ShaFormField>
 
-        <UFormGroup
-          size="lg"
-          label="Trigger of end"
-          name="endType"
-          help="Define when campaign should be stopped"
-        >
-          <USelectMenu v-model="state.endType" :options="endTypeList" />
-        </UFormGroup>
+        <ShaFormField v-slot="{ componentField }" size="lg" name="endType">
+          <AtomFormSelect
+            label="Trigger of end"
+            name="endType"
+            placeholder="Select end type"
+            description="Define when campaign should be stopped"
+            :field="componentField"
+            :items="endTypeList"
+          />
+        </ShaFormField>
       </div>
 
       <div class="flex flex-col gap-4 basis-2/3">
-        <UFormGroup
+        <ShaFormField
+          v-slot="{ componentField }"
           size="lg"
           label="Providers"
           name="providers"
           help="Providers to search for candidates"
         >
-          <div class="flex gap-2">
-            <div
-              v-for="provider of providersList"
-              class="size-32 border-2 rounded-xl grid place-items-center cursor-pointer"
-              :class="
-                state.providers.find((el) => el === provider.value)
-                  ? 'border-black'
-                  : 'border-gray-400'
-              "
-              @click="
-                state.providers?.includes(provider.value)
-                  ? state.providers.splice(
-                      state.providers.indexOf(provider.value),
-                      1
-                    )
-                  : state.providers.push(provider.value)
-              "
-            >
-              <UIcon
-                :name="provider.icon"
-                class="size-16"
-                :class="
-                  state.providers.find((el) => el === provider.value)
-                    ? 'text-black'
-                    : 'text-gray-400'
-                "
-              />
-            </div>
-          </div>
-        </UFormGroup>
+          <ShaFormItem>
+            <ShaFormLabel>Providers</ShaFormLabel>
+            <ShaFormDescription>
+              Providers to search for candidates
+            </ShaFormDescription>
+            <ShaFormControl>
+              <div class="flex gap-2">
+                <div
+                  v-for="provider of providersList"
+                  class="size-32 border-2 rounded-xl grid place-items-center cursor-pointer"
+                  :class="
+                    form.values.providers?.find((el) => el === provider.value)
+                      ? 'border-black'
+                      : 'border-gray-400'
+                  "
+                  @click="
+                    () => {
+                      const providers =
+                        form.controlledValues.value.providers || [];
+
+                      providers?.includes(provider.value)
+                        ? providers?.splice(
+                            providers?.indexOf(provider.value),
+                            1
+                          )
+                        : providers.push(provider.value);
+
+                      form.setFieldValue('providers', providers);
+                    }
+                  "
+                >
+                  <Icon
+                    :name="provider.icon"
+                    class="size-16"
+                    :class="
+                      form.values.providers?.find((el) => el === provider.value)
+                        ? 'text-black'
+                        : 'text-gray-400'
+                    "
+                  />
+                </div>
+              </div>
+
+              <ShaInput v-bind="componentField" class="hidden" />
+            </ShaFormControl>
+
+            <ShaFormMessage />
+          </ShaFormItem>
+        </ShaFormField>
       </div>
-    </UForm>
+    </Form>
   </div>
 </template>
