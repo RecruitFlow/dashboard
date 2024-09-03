@@ -109,7 +109,9 @@ if (params.id) {
   <div>
     <ClientOnly>
       <Teleport to="#nav-toolbar">
-        <UButton class="w-fit" @click="form?.submit()"> Submit </UButton>
+        <ShaButton @click="form?.submit()" variant="default">
+          Submit
+        </ShaButton>
       </Teleport>
     </ClientOnly>
     <UForm

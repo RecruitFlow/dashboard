@@ -1,5 +1,6 @@
 <script setup lang="ts">
-const router = useRouter();
+import type { Router } from "vue-router";
+const router = useRouter() as Router;
 const route = useRoute();
 const breadcrumbs = ref([]) as Ref<
   { icon: string; label: string; to: string }[]
@@ -42,5 +43,20 @@ watch(
 </script>
 
 <template>
-  <UBreadcrumb :links="breadcrumbs" />
+  <!-- <UBreadcrumb :links="breadcrumbs" /> -->
+  <ShaBreadcrumb>
+    <ShaBreadcrumbList>
+      <template v-for="(breadcrumb, index) in breadcrumbs">
+        <ShaBreadcrumbItem>
+          <ShaBreadcrumbLink class="flex align-middle gap-1">
+            <Icon :name="breadcrumb.icon" class="size-5" />
+            <NuxtLink :to="breadcrumb.to">{{ breadcrumb.label }}</NuxtLink>
+          </ShaBreadcrumbLink>
+        </ShaBreadcrumbItem>
+        <ShaBreadcrumbSeparator v-if="index < breadcrumbs.length - 1"
+          >/</ShaBreadcrumbSeparator
+        >
+      </template>
+    </ShaBreadcrumbList>
+  </ShaBreadcrumb>
 </template>

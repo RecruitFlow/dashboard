@@ -405,7 +405,10 @@ watch(data, (value) => {
   <ClientOnly>
     <Teleport to="#nav-toolbar">
       <NuxtLink :to="{ name: 'campaign-create' }">
-        <UButton variant="solid" icon="i-mage-plus">Create</UButton>
+        <ShaButton variant="secondary">
+          <Icon name="i-mage-plus" class="size-5 mr-2" />
+          Create
+        </ShaButton>
       </NuxtLink>
     </Teleport>
   </ClientOnly>

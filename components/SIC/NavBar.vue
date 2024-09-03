@@ -1,5 +1,10 @@
-<script setup>
-const { isMobileOrTablet } = useDevice();
+<script setup lang="ts">
+import { cn } from "@/lib/utils";
+
+defineProps<{
+  isCollapsed: boolean;
+}>();
+
 const links = [
   {
     label: "Dashboard",
@@ -23,52 +28,38 @@ const links = [
 </script>
 
 <template>
-  <MoleculeResizableWrapper
-    class="flex flex-col gap-2 w-full relative"
-    :min-width="200"
-    :max-width="300"
-    :collapsed-width="60"
-    :center-collapsed="true"
-    :freeze-collapsed="isMobileOrTablet"
-  >
-    <template #default="{ isCollapsed }">
-      <MoleculeSelectAccount
-        class="basis-14 grid place-items-center content-center px-2 border-b-[1px]"
-        :collapsed="isCollapsed"
-      />
-
-      <div
-        v-for="link in links"
-        :key="link.label"
-        class="px-2 flex flex-col justify-center align-middle items-center"
-      >
-        <NuxtLink :to="link.path" class="w-full">
-          <UButton
-            v-if="isCollapsed"
-            color="primary"
-            size="xl"
-            class="text-black dark:text-white"
-            :class="{
-              'bg-primary/10': $route.name === link.name,
-            }"
-            :icon="link.icon"
-            variant="ghost"
-            :square="true"
-          />
-          <UButton
-            v-else
-            color="primary"
-            size="xl"
-            class="w-full text-black dark:text-white"
-            :icon="link.icon"
-            :class="{
-              'bg-primary/10': $route.name === link.name,
-            }"
-            variant="ghost"
-            >{{ link.label }}</UButton
-          >
-        </NuxtLink>
-      </div>
-    </template>
-  </MoleculeResizableWrapper>
+  <div>
+    <div
+      v-for="link in links"
+      :key="link.label"
+      class="px-2 flex flex-col justify-center align-middle items-center"
+    >
+      <NuxtLink :to="link.path" class="w-full">
+        <ShaTooltip v-if="isCollapsed" :key="link.name" :delay-duration="0">
+          <ShaTooltipTrigger as-child>
+            <ShaButton
+              :variant="link.name === $route.name ? 'default' : 'ghost'"
+              size="icon"
+              class="h-9 w-9"
+            >
+              <Icon :name="link.icon" class="size-6" />
+              <span class="sr-only">{{ link.label }}</span>
+            </ShaButton>
+          </ShaTooltipTrigger>
+          <ShaTooltipContent side="right" class="flex items-center gap-4">
+            {{ link.label }}
+          </ShaTooltipContent>
+        </ShaTooltip>
+        <ShaButton
+          v-else
+          size="default"
+          class="w-full text-md flex justify-start items-center p-2"
+          :variant="link.name === $route.name ? 'default' : 'ghost'"
+        >
+          <Icon :name="link.icon" class="size-5 mr-2" />
+          {{ link.label }}</ShaButton
+        >
+      </NuxtLink>
+    </div>
+  </div>
 </template>

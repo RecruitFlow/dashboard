@@ -12,13 +12,13 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   modules: [
-    "nuxt-icon",
     "@nuxt/ui",
     "@nuxtjs/tailwindcss",
     "@nuxtjs/device",
     "@nuxtjs/apollo",
     "shadcn-nuxt",
     "dayjs-nuxt",
+    "@nuxt/icon",
   ],
 
   pages: true,
@@ -87,7 +87,15 @@ export default defineNuxtConfig({
   },
 
   ui: {
-    icons: ["mage", "bxl"],
+    // icons: ["mage", "bxl"],
+    // disableGlobalStyles: true,
+  },
+
+  icon: {
+    provider: "iconify",
+    serverBundle: {
+      collections: ["mage", "bxl"],
+    },
   },
 
   shadcn: {
