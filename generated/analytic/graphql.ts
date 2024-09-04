@@ -34,7 +34,7 @@ export type GroupByField = {
   /** count of candidates */
   count: Scalars['Int']['output'];
   /** count of candidates */
-  metric: Scalars['Int']['output'];
+  metric: Scalars['String']['output'];
 };
 
 export type Query = {
@@ -73,7 +73,7 @@ export type GroupByFieldQueryVariables = Exact<{
 }>;
 
 
-export type GroupByFieldQuery = { __typename?: 'Query', GroupByField: Array<{ __typename?: 'GroupByField', metric: number, count: number }> };
+export type GroupByFieldQuery = { __typename?: 'Query', GroupByField: Array<{ __typename?: 'GroupByField', metric: string, count: number }> };
 
 
 export const RangeAnalyticDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"rangeAnalytic"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"range"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"candidateRangeAnalytic"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"range"},"value":{"kind":"Variable","name":{"kind":"Name","value":"range"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"count"}}]}}]}}]} as unknown as DocumentNode<RangeAnalyticQuery, RangeAnalyticQueryVariables>;
@@ -105,7 +105,7 @@ export type GroupByField = {
   /** count of candidates */
   count: Scalars['Int']['output'];
   /** count of candidates */
-  metric: Scalars['Int']['output'];
+  metric: Scalars['String']['output'];
 };
 
 export type Query = {
@@ -144,4 +144,4 @@ export type GroupByFieldQueryVariables = Exact<{
 }>;
 
 
-export type GroupByFieldQuery = { __typename?: 'Query', GroupByField: Array<{ __typename?: 'GroupByField', metric: number, count: number }> };
+export type GroupByFieldQuery = { __typename?: 'Query', GroupByField: Array<{ __typename?: 'GroupByField', metric: string, count: number }> };

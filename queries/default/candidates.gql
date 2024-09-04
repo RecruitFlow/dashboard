@@ -1,5 +1,5 @@
-query Candidates($offset: Int!, $limit: Int!) {
-  candidates(offset: $offset, limit: $limit) {
+query Candidates($listCandidateInput: ListCandidateInput!) {
+  candidates(listCandidateInput: $listCandidateInput) {
     id
     name
     position

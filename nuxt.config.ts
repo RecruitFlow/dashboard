@@ -11,6 +11,10 @@ export default defineNuxtConfig({
 
   devtools: { enabled: true },
 
+  alias: {
+    "@components": "~/components",
+  },
+
   modules: [
     "@nuxt/ui",
     "@nuxtjs/tailwindcss",
@@ -20,7 +24,6 @@ export default defineNuxtConfig({
     "dayjs-nuxt",
     "@nuxt/icon",
   ],
-
   pages: true,
   components: true,
 
@@ -94,7 +97,7 @@ export default defineNuxtConfig({
   icon: {
     provider: "iconify",
     serverBundle: {
-      collections: ["mage", "bxl"],
+      collections: ["mage", "bxl", "solar"],
     },
   },
 

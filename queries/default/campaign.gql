@@ -52,15 +52,3 @@ query CampaignById($campaignByIdId: String!) {
     endValue
   }
 }
-
-query CampaignById($id: String!) {
-  campaignById(id: $id) {
-    name
-    keyword
-    status
-    providers
-    endType
-    endValue
-    id
-  }
-}
