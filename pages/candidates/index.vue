@@ -4,7 +4,7 @@ import {
   RemoveCandidateDocument,
 } from "@/generated/graphql/graphql.js";
 
-import { columns } from "@/components/Organism/Table/Candidate/columns.ts";
+import { columns } from "@/components/Molecule/Table/Columns/candidate";
 
 import type {
   CandidatesQuery,
@@ -19,7 +19,7 @@ definePageMeta({
 });
 
 //================ CONST DATA ================//
-const toast = useToast();
+// const toast = useToast();
 
 //================ VARIABLES ================//
 // Selected Rows
@@ -48,39 +48,38 @@ const {
 
 //================ Functions ================//
 
-async function deleteCandidates() {
-  const result = await useMutation(RemoveCandidateDocument, {
-    variables: {
-      removeCandidate: selectedRows.value.map((el) => el?.id),
-    },
-  }).mutate();
+// async function deleteCandidates() {
+//   const result = await useMutation(RemoveCandidateDocument, {
+//     variables: {
+//       removeCandidate: selectedRows.value.map((el) => el?.id),
+//     },
+//   }).mutate();
 
-  if (!result?.data?.removeCandidate) {
-    toast.add({
-      title: "Error",
-      description: `Unsuccessful deleting candidate...`,
-      color: "red",
-    });
+//   if (!result?.data?.removeCandidate) {
+//     toast.add({
+//       title: "Error",
+//       description: `Unsuccessful deleting candidate...`,
+//       color: "red",
+//     });
 
-    return;
-  }
+//     return;
+//   }
 
-  toast.add({
-    title: "Success",
-    description: `Deleted ${selectedRows.value.length} candidates`,
-    color: "primary",
-  });
+//   toast.add({
+//     title: "Success",
+//     description: `Deleted ${selectedRows.value.length} candidates`,
+//     color: "primary",
+//   });
 
-  selectedRows.value = [];
-  execute();
-}
+//   selectedRows.value = [];
+//   execute();
+// }
 
 //================ WATCHERS ================//
 </script>
 
 <template>
-  <OrganismTableCandidateDataTable
-    v-if="data?.candidates"
+  <MoleculeTable
     class="h-full"
     :columns="columns"
     :data="data?.candidates || []"
@@ -98,7 +97,6 @@ async function deleteCandidates() {
       ($event) => {
         sort.column = $event[0].id;
         sort.direction = !$event[0].desc ? 'asc' : 'desc';
-        // execute();
       }
     "
   />

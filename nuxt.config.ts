@@ -16,7 +16,7 @@ export default defineNuxtConfig({
   },
 
   modules: [
-    "@nuxt/ui",
+    // "@nuxt/ui",
     "@nuxtjs/tailwindcss",
     "@nuxtjs/device",
     "@nuxtjs/apollo",
@@ -87,11 +87,6 @@ export default defineNuxtConfig({
         },
       },
     },
-  },
-
-  ui: {
-    // icons: ["mage", "bxl"],
-    // disableGlobalStyles: true,
   },
 
   icon: {

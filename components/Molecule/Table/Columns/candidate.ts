@@ -1,6 +1,6 @@
 import { h } from "vue";
 import { Checkbox } from "@/components/ui/checkbox";
-import DropdownAction from "@/components/Organism/Table/Candidate/dropdown.vue";
+import DropdownAction from "~/components/Molecule/Table/dropdown.vue";
 import { ArrowUpDown, ChevronDown } from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
 import type { ColumnDef } from "@tanstack/vue-table";

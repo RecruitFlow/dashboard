@@ -32,8 +32,6 @@ const schema = toTypedSchema(
   })
 );
 
-const toast = useToast();
-
 const form = useForm({
   validationSchema: schema,
   initialValues: {
@@ -70,24 +68,24 @@ const onSubmit = form.handleSubmit(async (values) => {
   console.log(values);
   const isUpdate = !!params.id;
 
-  const result = await useMutation(
-    isUpdate ? UpdateCampaignDocument : CreateCampaignDocument,
-    {
-      variables: isUpdate
-        ? { updateCampaignInput: values, id: params.id as string }
-        : { createCampaignInput: values },
-    }
+  const result = await (isUpdate
+    ? useMutation(UpdateCampaignDocument, {
+        variables: { updateCampaignInput: values, id: params.id as string },
+      })
+    : useMutation(CreateCampaignDocument, {
+        variables: { createCampaignInput: values },
+      })
   ).mutate();
 
   const success = !result?.errors?.length;
 
-  toast.add({
-    title: success ? "Success" : "Error",
-    description: success
-      ? `Campaign ${isUpdate ? "Updated" : "Created"}`
-      : `Error`,
-    color: success ? "primary" : "red",
-  });
+  // toast.add({
+  //   title: success ? "Success" : "Error",
+  //   description: success
+  //     ? `Campaign ${isUpdate ? "Updated" : "Created"}`
+  //     : `Error`,
+  //   color: success ? "primary" : "red",
+  // });
 
   if (success) {
     navigateTo({ name: "campaign" });
@@ -116,7 +114,7 @@ if (params.id) {
   <div>
     <ClientOnly>
       <Teleport to="#nav-toolbar">
-        <ShaButton @click="onSubmit" variant="secondary"> Submit </ShaButton>
+        <ShaButton @click="onSubmit" variant="default"> Submit </ShaButton>
       </Teleport>
     </ClientOnly>
     <Form class="flex gap-10 w-full" @submit="onSubmit">

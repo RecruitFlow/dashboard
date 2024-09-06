@@ -23,11 +23,12 @@ function copy(id: string) {
     <ShaDropdownMenuContent align="end">
       <ShaDropdownMenuLabel>Actions</ShaDropdownMenuLabel>
       <ShaDropdownMenuItem @click="copy(candidate.id)">
-        Copy payment ID
+        Copy ID
       </ShaDropdownMenuItem>
       <ShaDropdownMenuSeparator />
-      <ShaDropdownMenuItem>View customer</ShaDropdownMenuItem>
-      <ShaDropdownMenuItem>View payment details</ShaDropdownMenuItem>
+      <ShaDropdownMenuItem>Edit</ShaDropdownMenuItem>
+      <ShaDropdownMenuItem>Details</ShaDropdownMenuItem>
+      <ShaDropdownMenuItem class="bg-red-400/20">Delete</ShaDropdownMenuItem>
     </ShaDropdownMenuContent>
   </ShaDropdownMenu>
 </template>
