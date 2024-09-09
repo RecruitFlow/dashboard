@@ -3,6 +3,7 @@ import type {
   ColumnDef,
   SortingState,
   PaginationState,
+  RowSelectionState,
 } from "@tanstack/vue-table";
 import {
   FlexRender,
@@ -32,6 +33,8 @@ const pagination = ref<PaginationState>({
   pageSize: 13,
 });
 
+const selectedRows = ref<RowSelectionState>({});
+
 const table = useVueTable({
   get data() {
     return props.data;
@@ -43,6 +46,9 @@ const table = useVueTable({
   getSortedRowModel: getSortedRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
   onSortingChange: (updaterOrValue) => valueUpdater(updaterOrValue, sorting),
+  onRowSelectionChange: (updaterOrValue) => {
+    valueUpdater(updaterOrValue, selectedRows);
+  },
   onPaginationChange: (updaterOrValue) =>
     valueUpdater(updaterOrValue, pagination),
   state: {
@@ -52,23 +58,30 @@ const table = useVueTable({
     get pagination() {
       return pagination.value;
     },
+    get rowSelection() {
+      return selectedRows.value;
+    },
   },
   manualPagination: true,
+  enableMultiSort: false,
   get rowCount() {
     return props.total;
   },
-});
-
-watch(pagination, () => {
-  emit("update:pagination", pagination.value);
 });
 
 watch(sorting, () => {
   emit("update:sorting", sorting.value);
 });
 
+watch(pagination, () => {
+  emit("update:pagination", pagination.value);
+});
+
 defineExpose({
-  selectedColumns: table.getSelectedRowModel().rows,
+  selectedRowsIds: () => table.getSelectedRowModel().rows.map((row) => row.id),
+  resetSelectedColumns: table.resetRowSelection,
+  isSomeRowSelected: table.getIsSomeRowsSelected,
+  isAllRowSelected: table.getIsAllRowsSelected,
 });
 </script>
 
@@ -101,6 +114,13 @@ defineExpose({
                 :render="cell.column.columnDef.cell"
                 :props="cell.getContext()"
               />
+            </ShaTableCell>
+          </ShaTableRow>
+        </template>
+        <template v-else-if="loading">
+          <ShaTableRow v-for="i in 4">
+            <ShaTableCell :colspan="columns.length" class="h-24 text-center">
+              <ShaSkeleton class="size-full" />
             </ShaTableCell>
           </ShaTableRow>
         </template>

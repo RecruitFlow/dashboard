@@ -2,8 +2,7 @@
 import type { ComponentFieldBindingObject } from "vee-validate";
 
 interface FormInputProps {
-  label: string;
-  name: string;
+  label?: string;
   icon?: string;
   placeholder?: string;
   description?: string;

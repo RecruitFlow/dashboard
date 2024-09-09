@@ -32,7 +32,7 @@ export const columns: ColumnDef<Candidate>[] = [
     cell: ({ row }) => {
       return h("div", { class: "text-left font-base" }, row.getValue("name"));
     },
-    enableSorting: true,
+    enableSorting: false,
   },
   {
     accessorKey: "position",
@@ -44,7 +44,7 @@ export const columns: ColumnDef<Candidate>[] = [
         row.getValue("position")
       );
     },
-    enableSorting: true,
+    enableSorting: false,
   },
   {
     accessorKey: "yearsOfExperience",
@@ -53,7 +53,8 @@ export const columns: ColumnDef<Candidate>[] = [
         Button,
         {
           variant: "ghost",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+          onClick: () =>
+            column.toggleSorting(column.getIsSorted() === "asc", false),
         },
         () => ["Experience", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
@@ -120,7 +121,7 @@ export const columns: ColumnDef<Candidate>[] = [
         "div",
         { class: "relative" },
         h(DropdownAction, {
-          candidate,
+          data: candidate,
         })
       );
     },

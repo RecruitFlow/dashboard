@@ -4,14 +4,18 @@ import {
   CampaignByIdDocument,
   UpdateCampaignDocument,
 } from "@/generated/graphql/graphql.js";
+
+import type { CampaignByIdQueryVariables } from "@/generated/graphql/graphql.js";
 import * as z from "zod";
 import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
+import { useToast } from "@/components/ui/toast/use-toast";
 
 type Providers = "WORKUA" | "ROBOTAUA" | "LINKEDIN";
 type CampaignEndType = "NEVER" | "DATE" | "COUNT";
 
 const { params } = useRoute();
+const { toast } = useToast();
 
 definePageMeta({
   name: `campaign-create`,
@@ -79,13 +83,13 @@ const onSubmit = form.handleSubmit(async (values) => {
 
   const success = !result?.errors?.length;
 
-  // toast.add({
-  //   title: success ? "Success" : "Error",
-  //   description: success
-  //     ? `Campaign ${isUpdate ? "Updated" : "Created"}`
-  //     : `Error`,
-  //   color: success ? "primary" : "red",
-  // });
+  toast({
+    title: `${isUpdate ? "Updated" : "Created"}`,
+    description: success
+      ? `Campaign has been ${isUpdate ? "updated" : "created"}`
+      : "Error",
+    variant: success ? "default" : "destructive",
+  });
 
   if (success) {
     navigateTo({ name: "campaign" });
@@ -94,8 +98,8 @@ const onSubmit = form.handleSubmit(async (values) => {
 
 if (params.id) {
   const { data } = await useAsyncQuery(CampaignByIdDocument, {
-    id: params.id as string,
-  });
+    campaignById: params.id,
+  } as CampaignByIdQueryVariables);
 
   const campaign = data.value?.campaignById;
 

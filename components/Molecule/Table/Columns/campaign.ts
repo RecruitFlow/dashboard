@@ -1,5 +1,6 @@
 import { h } from "vue";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import DropdownAction from "~/components/Molecule/Table/dropdown.vue";
 import { ArrowUpDown, ChevronDown } from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
@@ -50,7 +51,15 @@ export const columns: ColumnDef<Campaign>[] = [
     accessorKey: "status",
     header: () => h("div", { class: "text-left" }, "Status"),
     cell: ({ row }) => {
-      return h("div", { class: "text-left font-base" }, row.getValue("status"));
+      return h(
+        Badge,
+        {
+          class: "text-left font-base",
+          variant:
+            row.getValue("status") === "ACTIVE" ? "destructive" : "outline",
+        },
+        row.getValue("status")
+      );
     },
     enableSorting: true,
   },
@@ -71,8 +80,8 @@ export const columns: ColumnDef<Campaign>[] = [
     header: () => h("div", { class: "text-left" }, "End Type"),
     cell: ({ row }) => {
       return h(
-        "div",
-        { class: "text-left font-base" },
+        Badge,
+        { class: "text-left font-base", variant: "secondary" },
         row.getValue("endType")
       );
     },
@@ -91,11 +100,10 @@ export const columns: ColumnDef<Campaign>[] = [
       );
     },
     cell: ({ row }) => {
-      const { createdAt } = row.original;
       return h(
         "div",
         { class: "text-left font-base" },
-        useRelativeTime(createdAt)
+        useRelativeTime(row.getValue("createdAt"))
       );
     },
     enableSorting: true,
@@ -104,13 +112,13 @@ export const columns: ColumnDef<Campaign>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const candidate = row.original;
+      const campaign = row.original;
 
       return h(
         "div",
         { class: "relative" },
         h(DropdownAction, {
-          candidate,
+          data: campaign,
         })
       );
     },

@@ -31,6 +31,7 @@ query Campaign($listCampaignInput: ListCampaignInput!) {
     providers
     endType
     endValue
+    createdAt
     id
   }
 
@@ -39,8 +40,8 @@ query Campaign($listCampaignInput: ListCampaignInput!) {
   }
 }
 
-query CampaignById($campaignByIdId: String!) {
-  campaignById(id: $campaignByIdId) {
+query CampaignById($campaignById: String!) {
+  campaignById(id: $campaignById) {
     id
     name
     keyword
