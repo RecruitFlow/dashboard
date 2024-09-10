@@ -11,7 +11,7 @@ defineProps<{
 
 <template>
   <div class="flex flex-col gap-1">
-    <div class="text-xl font-semibold">{{ title }} years</div>
+    <div class="text-xl font-semibold">{{ title }}</div>
     <ShaSeparator />
     <div
       v-for="(item, key) in data.filter((item) => !!item.name)"

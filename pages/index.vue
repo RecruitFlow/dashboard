@@ -1,29 +1,30 @@
 <script setup lang="ts">
 import {
   RangeAnalyticDocument,
-  GroupByFieldDocument,
+  GroupByFieldDocument
 } from "@/generated/analytic/graphql.js";
 import dayjs from "dayjs";
 import CustomTooltip from "@/components/Molecule/Chart/Tooltip.vue";
 import CustomExperienceTooltip from "@/components/Molecule/Chart/ExperienceTooltip.vue";
+import LocationTooltip from "@/components/Molecule/Chart/LocationTooltip.vue";
 
 import type {
   RangeAnalyticQuery,
   GroupByFieldQuery,
-  GroupByFieldQueryVariables,
+  GroupByFieldQueryVariables
 } from "@/generated/analytic/graphql.js";
 
 definePageMeta({
   name: "index",
   title: "Dashboard",
-  icon: "i-mage-dashboard-bar",
+  icon: "i-mage-dashboard-bar"
 });
 
 const { loading: rangeAnalyticPending, result: rangeAnalytic } =
   useQuery<RangeAnalyticQuery>(
     RangeAnalyticDocument,
     {
-      range: 31,
+      range: 31
     },
     { clientId: "analytic", fetchPolicy: "no-cache" }
   );
@@ -32,7 +33,7 @@ const { loading: experienceAnalyticPending, result: experienceAnalytic } =
   useQuery<GroupByFieldQuery>(
     GroupByFieldDocument,
     {
-      groupAnalyticInput: { field: "yearsOfExperience" },
+      groupAnalyticInput: { field: "yearsOfExperience" }
     } as GroupByFieldQueryVariables,
     { clientId: "analytic", fetchPolicy: "no-cache" }
   );
@@ -41,7 +42,7 @@ const { loading: ageAnalyticPending, result: ageAnalytic } =
   useQuery<GroupByFieldQuery>(
     GroupByFieldDocument,
     {
-      groupAnalyticInput: { field: "age" },
+      groupAnalyticInput: { field: "age" }
     } as GroupByFieldQueryVariables,
     { clientId: "analytic", fetchPolicy: "no-cache" }
   );
@@ -50,7 +51,7 @@ const { loading: workLocationAnalyticPending, result: workLocationAnalytic } =
   useQuery<GroupByFieldQuery>(
     GroupByFieldDocument,
     {
-      groupAnalyticInput: { field: "workLocation" },
+      groupAnalyticInput: { field: "workLocation" }
     } as GroupByFieldQueryVariables,
     { clientId: "analytic", fetchPolicy: "no-cache" }
   );
@@ -128,6 +129,7 @@ const { loading: workLocationAnalyticPending, result: workLocationAnalytic } =
           :show-x-axis="false"
           :show-y-axis="false"
           :colors="['black']"
+          :custom-tooltip="LocationTooltip"
         />
       </ShaCardContent>
     </ShaCard>

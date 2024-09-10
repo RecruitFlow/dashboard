@@ -2,14 +2,14 @@
 import type {
   ListCampaignInput,
   Campaign,
-  CampaignQuery,
+  CampaignQuery
 } from "@/generated/graphql/graphql.js";
 
 import type { ComponentExposed } from "vue-component-type-helpers";
 
 import {
   CampaignDocument,
-  RemoveCampaignDocument,
+  RemoveCampaignDocument
 } from "@/generated/graphql/graphql.js";
 
 import MoleculeTable from "@/components/Molecule/Table/index.vue";
@@ -21,7 +21,7 @@ import { columns } from "@/components/Molecule/Table/Columns/campaign";
 definePageMeta({
   name: "campaign",
   title: "Campaigns",
-  icon: "i-mage-megaphone-a",
+  icon: "i-mage-megaphone-a"
 });
 
 //================ CONST DATA ================//
@@ -32,24 +32,23 @@ const { toast } = useToast();
 const variables = reactive<ListCampaignInput>({
   offset: 0,
   limit: 10,
-  filterKey: null,
-  filterValue: null,
   sortKey: "createdAt",
   sortValue: "desc",
+  filters: []
 });
 //================ REQUEST ================//
 
 const {
   loading: pending,
   result: data,
-  refetch: refetch,
+  refetch: refetch
 } = useQuery<CampaignQuery>(
   CampaignDocument,
   {
-    listCampaignInput: variables,
+    listCampaignInput: variables
   },
   {
-    fetchPolicy: "no-cache",
+    fetchPolicy: "no-cache"
   }
 );
 
@@ -60,15 +59,15 @@ const table = useTemplateRef<ComponentExposed<typeof MoleculeTable>>("table");
 async function deleteCampaigns(ids: string[] = []) {
   const result = await useMutation(RemoveCampaignDocument, {
     variables: {
-      removeCampaignId: ids,
-    },
+      removeCampaignId: ids
+    }
   }).mutate();
 
   if (result?.data?.removeCampaign) {
     toast({
       title: `Success`,
       description: `Deleted ${ids.length} campaigns`,
-      variant: "default",
+      variant: "default"
     });
 
     table.value?.resetSelectedColumns();
@@ -78,7 +77,7 @@ async function deleteCampaigns(ids: string[] = []) {
     toast({
       title: `Error`,
       description: `Error deleting ${ids.length} campaigns`,
-      variant: "destructive",
+      variant: "destructive"
     });
   }
 }
@@ -93,17 +92,15 @@ provide("tableActions", {
   },
   delete: (id: string) => {
     deleteCampaigns([id]);
-  },
+  }
 });
 </script>
 
 <template>
   <div class="flex flex-col h-full">
-    <div
-      class="w-full h-fit border-[1px] border-b-0 rounded-t-md p-2 flex gap-1"
-    >
+    <div class="w-full h-fit flex gap-1 py-2">
       <div class="basis-1/2 flex gap-1">
-        <div class="relative w-full max-w-sm items-center">
+        <div class="relative w-full max-w-xs items-center">
           <ShaInput
             id="search"
             type="text"
@@ -116,18 +113,82 @@ provide("tableActions", {
             <Icon name="i-mage-search" class="size-6 text-muted-foreground" />
           </span>
         </div>
-
-        <MoleculeSelectWithIcon
-          class="w-64"
-          :items="[{ value: 'some', label: 'some', icon: 'some' }]"
-          :is-collapsed="true"
+        <MoleculeTableFilter
+          title="Status"
+          :column="table?.getColumn('status')"
+          :options="[
+            {
+              label: 'Active',
+              value: 'ACTIVE',
+              icon: 'i-mdi-progress-star-four-points'
+            },
+            {
+              label: 'Paused',
+              value: 'PAUSED',
+              icon: 'i-mdi-progress-question'
+            },
+            {
+              label: 'Deleted',
+              value: 'DELETED',
+              icon: 'i-mdi-progress-close'
+            },
+            { label: 'Ended', value: 'ENDED', icon: 'i-mdi-progress-check' }
+          ]"
         />
+
+        <MoleculeTableFilter
+          title="End Type"
+          :column="table?.getColumn('endType')"
+          :options="[
+            {
+              label: 'Never',
+              value: 'NEVER',
+              icon: 'i-mage-reload'
+            },
+            {
+              label: 'Date',
+              value: 'DATE',
+              icon: 'i-mage-alarm-clock'
+            },
+            {
+              label: 'Count',
+              value: 'COUNT',
+              icon: 'i-mage-lock'
+            }
+          ]"
+        />
+
+        <ShaButton
+          v-if="variables.filters.length"
+          variant="ghost"
+          @click="table?.resetFilters()"
+        >
+          Reset
+          <Icon name="i-material-symbols-close-rounded" class="size-5 ml-1" />
+        </ShaButton>
       </div>
 
-      <div class="basis-1/2 justify-end flex">
+      <div class="basis-1/2 justify-end flex gap-1">
+        <ShaButton
+          variant="secondary"
+          :disabled="!table?.haveSelectedRow"
+          @click="
+            deleteCampaigns(
+              table
+                ?.selectedRowsIds()
+                .map((id) => {
+                  return data?.campaign[id]?.id;
+                })
+                .filter(Boolean)
+            )
+          "
+        >
+          Pause
+        </ShaButton>
+
         <ShaButton
           variant="destructive"
-          :disabled="!table?.isSomeRowSelected()"
+          :disabled="!table?.haveSelectedRow"
           @click="
             deleteCampaigns(
               table
@@ -146,7 +207,7 @@ provide("tableActions", {
 
     <MoleculeTable
       ref="table"
-      class="h-full rounded-t-none"
+      class="h-full"
       :columns="columns"
       :data="data?.campaign || []"
       :total="data?.campaignCount.count || 0"
@@ -163,6 +224,11 @@ provide("tableActions", {
           variables.sortKey = $event[0].id;
           variables.sortValue = !$event[0].desc ? 'asc' : 'desc';
           refetch();
+        }
+      "
+      @update:filters="
+        ($event) => {
+          variables.filters = $event;
         }
       "
     />

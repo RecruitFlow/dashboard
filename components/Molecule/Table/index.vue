@@ -4,6 +4,7 @@ import type {
   SortingState,
   PaginationState,
   RowSelectionState,
+  ColumnFiltersState
 } from "@tanstack/vue-table";
 import {
   FlexRender,
@@ -11,6 +12,7 @@ import {
   useVueTable,
   getSortedRowModel,
   getPaginationRowModel,
+  getFilteredRowModel
 } from "@tanstack/vue-table";
 import { valueUpdater } from "@/lib/table/valueUpdater";
 
@@ -24,13 +26,16 @@ const props = defineProps<{
 const emit = defineEmits({
   "update:pagination": (value: PaginationState) => true,
   "update:sorting": (value: SortingState) => true,
+  "update:filters": (value: ColumnFiltersState) => true
 });
 
 const sorting = ref<SortingState>([]);
 
+const filters = ref<ColumnFiltersState>([]);
+
 const pagination = ref<PaginationState>({
   pageIndex: 0,
-  pageSize: 13,
+  pageSize: 13
 });
 
 const selectedRows = ref<RowSelectionState>({});
@@ -45,7 +50,10 @@ const table = useVueTable({
   getCoreRowModel: getCoreRowModel(),
   getSortedRowModel: getSortedRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
+  getFilteredRowModel: getFilteredRowModel(),
   onSortingChange: (updaterOrValue) => valueUpdater(updaterOrValue, sorting),
+  onColumnFiltersChange: (updaterOrValue) =>
+    valueUpdater(updaterOrValue, filters),
   onRowSelectionChange: (updaterOrValue) => {
     valueUpdater(updaterOrValue, selectedRows);
   },
@@ -61,12 +69,17 @@ const table = useVueTable({
     get rowSelection() {
       return selectedRows.value;
     },
+    get columnFilters() {
+      return filters.value;
+    }
   },
   manualPagination: true,
+  manualFiltering: true,
   enableMultiSort: false,
+  enableColumnFilters: true,
   get rowCount() {
     return props.total;
-  },
+  }
 });
 
 watch(sorting, () => {
@@ -77,11 +90,18 @@ watch(pagination, () => {
   emit("update:pagination", pagination.value);
 });
 
+watch(filters, () => {
+  emit("update:filters", filters.value);
+});
+
 defineExpose({
   selectedRowsIds: () => table.getSelectedRowModel().rows.map((row) => row.id),
   resetSelectedColumns: table.resetRowSelection,
-  isSomeRowSelected: table.getIsSomeRowsSelected,
-  isAllRowSelected: table.getIsAllRowsSelected,
+  resetFilters: table.resetColumnFilters,
+  getColumn: table.getColumn,
+  haveSelectedRow: computed(() => {
+    return table.getIsSomeRowsSelected() || table.getIsAllRowsSelected();
+  })
 });
 </script>
 

@@ -25,7 +25,7 @@ CMD [ "pnpm", "run", "dev" ]
 # ===== Production Stage =====
 FROM base AS prod
 
-WORKDIR /app/apps/dashboard
+WORKDIR /app/dashboard
 
 # Expose the port the app runs on
 EXPOSE 3000
